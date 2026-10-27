@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  check:
+    name: fmt · clippy · test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: Test
+        run: cargo test --workspace --all-targets --locked
+      - name: TOCTOU harness (secure, must be 0 escapes)
+        run: cargo run --release --bin ask-sandbox-harness -- -n=1000
+      - name: TOCTOU harness (CONTINUE control, must see escapes)
+        run: cargo run --release --bin ask-sandbox-harness -- -n=1000 --continue-control
+      - name: Latency bench
+        run: cargo run --release --bin ask-sandbox-bench
+      - name: Tasks without relaunch
+        run: |
+          cargo run --release --bin ask-sandbox-tasks -- --static -n=20
+          cargo run --release --bin ask-sandbox-tasks -- --ask -n=20
