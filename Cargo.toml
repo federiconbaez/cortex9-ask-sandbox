@@ -1,0 +1,36 @@
+[package]
+name = "ask-sandbox"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.82"
+license = "Apache-2.0"
+description = "seccomp user-notification supervisor that decides per syscall and opens files itself (no TOCTOU on path pointers)"
+repository = "https://github.com/federiconbaez/cortex9-ask-sandbox"
+readme = "README.md"
+keywords = ["seccomp", "sandbox", "unotify", "agents", "linux"]
+categories = ["os::linux-apis", "command-line-utilities"]
+publish = false
+
+[dependencies]
+libc = "0.2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+debug = false
+
+[[bin]]
+name = "ask-sandbox"
+path = "src/bin/ask-sandbox.rs"
+
+[[bin]]
+name = "ask-sandbox-harness"
+path = "src/bin/ask-sandbox-harness.rs"
+
+[[bin]]
+name = "ask-sandbox-bench"
+path = "src/bin/ask-sandbox-bench.rs"
+
+[[bin]]
+name = "ask-sandbox-tasks"
+path = "src/bin/ask-sandbox-tasks.rs"
